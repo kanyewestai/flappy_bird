@@ -64,7 +64,11 @@
   }
 
   const canvas = document.getElementById("game");
-  const ctx = canvas.getContext("2d");
+  const ctx =
+    canvas.getContext("2d", {
+      alpha: false,
+      desynchronized: true,
+    }) || canvas.getContext("2d");
   const scoreEl = document.getElementById("score");
   const finalCoinsEl = document.getElementById("final-coins");
   const overlayStart = document.getElementById("overlay-start");
@@ -133,8 +137,8 @@
       typeof window.matchMedia === "function" &&
       (window.matchMedia("(pointer: coarse)").matches ||
         window.matchMedia("(max-width: 768px)").matches);
-    /** Fewer physical pixels on phones cuts fill-rate cost a lot vs DPR 2. */
-    dpr = Math.min(ratio, canvasLite ? 1.5 : 2);
+    /** Phones: DPR 1 keeps the backbuffer small (biggest win vs “airy” jank). */
+    dpr = Math.min(ratio, canvasLite ? 1 : 2);
     canvas.style.width = WIDTH + "px";
     canvas.style.height = HEIGHT + "px";
     canvas.width = Math.round(WIDTH * dpr);
@@ -423,10 +427,35 @@
     ctx.drawImage(bgSeamStripCanvas, Math.round(screenX), 0);
   }
 
+  /** One drawImage per tile + no seam strip (much cheaper than split body + blend on GPU). */
+  function drawBackgroundSimple() {
+    const iw = bgImg.naturalWidth;
+    const ih = bgImg.naturalHeight;
+    const tileW = bgTileWidth();
+    let offset = bgScroll % tileW;
+    if (offset < 0) {
+      offset += tileW;
+    }
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, 0, WIDTH, HEIGHT);
+    ctx.clip();
+    let x = -offset;
+    while (x < WIDTH + tileW) {
+      ctx.drawImage(bgImg, 0, 0, iw, ih, x, 0, tileW, HEIGHT);
+      x += tileW;
+    }
+    ctx.restore();
+  }
+
   function drawBackground() {
     if (!bgReady || !bgImg.naturalWidth) {
       ctx.fillStyle = "#1a1a2e";
       ctx.fillRect(0, 0, WIDTH, HEIGHT);
+      return;
+    }
+    if (canvasLite) {
+      drawBackgroundSimple();
       return;
     }
     const iw = bgImg.naturalWidth;
@@ -602,12 +631,14 @@
       drawX += HUD_COIN_ICON + gap;
     }
 
-    const hudBlur = canvasLite ? 2 : 6;
+    const hudBlur = canvasLite ? 0 : 6;
     ctx.fillStyle = "#fff";
-    ctx.shadowColor = "rgba(0,0,0,0.72)";
-    ctx.shadowBlur = hudBlur;
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 2;
+    if (hudBlur > 0) {
+      ctx.shadowColor = "rgba(0,0,0,0.72)";
+      ctx.shadowBlur = hudBlur;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 2;
+    }
     ctx.fillText(text, drawX, cy);
     ctx.restore();
   }
@@ -619,12 +650,14 @@
     ctx.textBaseline = "middle";
     const cy = HUD_TOP + HUD_COIN_ICON / 2;
     const label = "HI " + String(bestCoins);
-    const hudBlur = canvasLite ? 2 : 5;
+    const hudBlur = canvasLite ? 0 : 5;
     ctx.fillStyle = "#fff";
-    ctx.shadowColor = "rgba(0,0,0,0.72)";
-    ctx.shadowBlur = hudBlur;
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 2;
+    if (hudBlur > 0) {
+      ctx.shadowColor = "rgba(0,0,0,0.72)";
+      ctx.shadowBlur = hudBlur;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 2;
+    }
     ctx.fillText(label, WIDTH - 12, cy);
     ctx.restore();
   }
