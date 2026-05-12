@@ -53,9 +53,14 @@ body {
 }
 
 @media (max-width: 600px) {
+  .page-frame {
+    padding-top: calc(12px + env(safe-area-inset-top, 0px));
+  }
+
   .game-logo {
-    width: min(320px, 82vw);
-    max-height: min(120px, 22vh);
+    width: min(276px, 74vw);
+    max-height: min(100px, 19vh);
+    margin-top: 8px;
   }
 }
 
