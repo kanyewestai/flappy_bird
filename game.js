@@ -710,6 +710,39 @@
     flap();
   });
 
+  /**
+   * Reduce iOS/Android zoom on the board: block pinch (multi-touch), scroll chaining
+   * on the canvas, and double-click zoom; keep single-touch → pointer events for flap().
+   */
+  canvas.addEventListener(
+    "touchstart",
+    function (e) {
+      if (e.touches.length > 1) {
+        e.preventDefault();
+      }
+    },
+    { passive: false }
+  );
+  canvas.addEventListener(
+    "touchmove",
+    function (e) {
+      e.preventDefault();
+    },
+    { passive: false }
+  );
+  canvas.addEventListener("dblclick", function (e) {
+    e.preventDefault();
+  });
+  canvas.addEventListener(
+    "wheel",
+    function (e) {
+      if (e.ctrlKey) {
+        e.preventDefault();
+      }
+    },
+    { passive: false }
+  );
+
   /** WebKit/iOS: pinch & double-tap zoom gestures (viewport alone is not always enough). */
   function preventSafariZoomGestures(ev) {
     ev.preventDefault();
