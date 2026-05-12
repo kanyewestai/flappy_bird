@@ -710,6 +710,20 @@
     flap();
   });
 
+  /** WebKit/iOS: pinch & double-tap zoom gestures (viewport alone is not always enough). */
+  function preventSafariZoomGestures(ev) {
+    ev.preventDefault();
+  }
+  document.addEventListener("gesturestart", preventSafariZoomGestures, {
+    passive: false,
+  });
+  document.addEventListener("gesturechange", preventSafariZoomGestures, {
+    passive: false,
+  });
+  document.addEventListener("gestureend", preventSafariZoomGestures, {
+    passive: false,
+  });
+
   window.addEventListener("keydown", onKeyDown);
   window.addEventListener("resize", syncCanvasSize);
 

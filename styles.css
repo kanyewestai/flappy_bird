@@ -36,10 +36,12 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 14px;
+  /** Tight space between logo layout box and game — logo image shifted down via transform only. */
+  gap: 6px;
   max-width: 100%;
   padding: 12px 16px;
   box-sizing: border-box;
+  touch-action: manipulation;
 }
 
 .game-logo {
@@ -50,6 +52,8 @@ body {
   object-fit: contain;
   pointer-events: none;
   user-select: none;
+  /** Moves only the artwork down; layout flow (and game board position) stays the same. */
+  transform: translateY(28px);
 }
 
 @media (max-width: 600px) {
@@ -60,7 +64,7 @@ body {
   .game-logo {
     width: min(276px, 74vw);
     max-height: min(100px, 19vh);
-    margin-top: 8px;
+    transform: translateY(24px);
   }
 }
 
@@ -70,7 +74,9 @@ body {
   border-radius: 12px;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
   overflow: hidden;
-  touch-action: manipulation;
+  /** Game handles taps in JS — block Safari double-tap zoom & pinch on the board. */
+  touch-action: none;
+  -webkit-touch-callout: none;
 }
 
 #game {
@@ -81,6 +87,7 @@ body {
   vertical-align: middle;
   position: relative;
   z-index: 1;
+  touch-action: none;
 }
 
 .overlay {
