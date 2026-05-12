@@ -1,0 +1,184 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+  overflow: hidden;
+  touch-action: manipulation;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+}
+
+body {
+  height: 100%;
+  min-height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: manipulation;
+  -webkit-overflow-scrolling: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #1a1a2e;
+  font-family: system-ui, -apple-system, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.page-frame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  max-width: 100%;
+  padding: 12px 16px;
+  box-sizing: border-box;
+}
+
+.game-logo {
+  display: block;
+  width: min(400px, 92vw);
+  max-height: min(168px, 30vh);
+  height: auto;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+#game-shell {
+  position: relative;
+  background: #1a1a2e;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  touch-action: manipulation;
+}
+
+#game {
+  display: block;
+  width: 400px;
+  max-width: 100%;
+  height: auto;
+  vertical-align: middle;
+  position: relative;
+  z-index: 1;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  z-index: 3;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  /** Touches go through to the canvas (same listener handles flap / restart). */
+  pointer-events: none;
+}
+
+.overlay * {
+  pointer-events: none;
+}
+
+.overlay.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.overlay .title {
+  margin: 0;
+  max-width: 100%;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.95rem;
+  font-weight: normal;
+  line-height: 1.7;
+  letter-spacing: 0.04em;
+  color: #fff;
+  text-shadow: 0 2px 0 #000, 0 3px 10px rgba(0, 0, 0, 0.5);
+}
+
+#overlay-gameover .title {
+  color: #ff3b3b;
+  text-shadow: 0 2px 0 #5c0000, 0 3px 14px rgba(0, 0, 0, 0.65),
+    0 0 18px rgba(255, 60, 60, 0.35);
+}
+
+.overlay p {
+  margin: 0;
+}
+
+@keyframes tap-fade {
+  0%,
+  100% {
+    opacity: 0.28;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.tap-hint {
+  margin-top: 1rem;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.55rem;
+  font-weight: normal;
+  line-height: 1.6;
+  letter-spacing: 0.12em;
+  color: #fff;
+  text-transform: lowercase;
+  text-shadow: 0 2px 0 #000, 0 2px 8px rgba(0, 0, 0, 0.55);
+  animation: tap-fade 2.8s ease-in-out infinite;
+}
+
+#overlay-start .tap-hint {
+  margin-top: 0;
+  font-size: 1rem;
+  letter-spacing: 0.16em;
+}
+
+.tap-hint-gameover {
+  margin-top: 1.25rem;
+  font-size: 0.95rem;
+  letter-spacing: 0.14em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tap-hint {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+.final-coins-row {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+#final-coins {
+  font-family: "Press Start 2P", monospace;
+  font-size: 1.35rem;
+  font-weight: normal;
+  line-height: 1.4;
+}
+
+.final-coins-row img {
+  object-fit: contain;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+}

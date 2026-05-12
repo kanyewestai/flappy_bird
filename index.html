@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <title>Flappy Bibi</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-frame">
+      <img
+        class="game-logo"
+        src="logo.png"
+        alt="Flappy Bibi"
+        decoding="async"
+      />
+      <div id="game-shell">
+        <canvas id="game" aria-label="Flappy game canvas"></canvas>
+        <div id="overlay-start" class="overlay visible">
+          <p class="tap-hint">tap</p>
+        </div>
+        <div id="overlay-gameover" class="overlay">
+          <p class="title">Game Over</p>
+          <p id="final-coins-row" class="final-coins-row">
+            <img src="coin.png" alt="" width="32" height="32" decoding="async" />
+            <span id="final-coins">0</span>
+          </p>
+          <p class="tap-hint tap-hint-gameover">tap</p>
+        </div>
+      </div>
+    </div>
+    <script src="game.js"></script>
+  </body>
+</html>
