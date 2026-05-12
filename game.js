@@ -71,6 +71,8 @@
   const overlayGameover = document.getElementById("overlay-gameover");
 
   let dpr = 1;
+  /** Touch / narrow viewports: cheaper canvas (lower DPR, lighter HUD FX). */
+  let canvasLite = false;
   let state = "ready";
   let score = 0;
   let coins = 0;
@@ -89,6 +91,9 @@
   let birdReady = false;
   birdImg.onload = function () {
     birdReady = true;
+    if (birdImg.decode) {
+      birdImg.decode().catch(function () {});
+    }
   };
   birdImg.src = "bird.png";
 
@@ -123,7 +128,13 @@
   let pipes = [];
 
   function syncCanvasSize() {
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const ratio = window.devicePixelRatio || 1;
+    canvasLite =
+      typeof window.matchMedia === "function" &&
+      (window.matchMedia("(pointer: coarse)").matches ||
+        window.matchMedia("(max-width: 768px)").matches);
+    /** Fewer physical pixels on phones cuts fill-rate cost a lot vs DPR 2. */
+    dpr = Math.min(ratio, canvasLite ? 1.5 : 2);
     canvas.style.width = WIDTH + "px";
     canvas.style.height = HEIGHT + "px";
     canvas.width = Math.round(WIDTH * dpr);
@@ -131,7 +142,7 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.imageSmoothingEnabled = true;
     if ("imageSmoothingQuality" in ctx) {
-      ctx.imageSmoothingQuality = "high";
+      ctx.imageSmoothingQuality = canvasLite ? "low" : "high";
     }
   }
 
@@ -475,29 +486,23 @@
     const spriteOk =
       sprite.naturalWidth > 0 && (useDead ? deadReady : birdReady);
 
-    if (spriteOk) {
-      const iw = sprite.naturalWidth;
-      const ih = sprite.naturalHeight;
-      ctx.drawImage(
-        sprite,
-        0,
-        0,
-        iw,
-        ih,
-        -BIRD_W / 2,
-        -BIRD_H / 2,
-        BIRD_W,
-        BIRD_H
-      );
-    } else {
-      ctx.fillStyle = "#f5d742";
-      ctx.strokeStyle = "#c9a227";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.ellipse(0, 0, BIRD_W / 2, BIRD_H / 2, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
+    if (!spriteOk) {
+      ctx.restore();
+      return;
     }
+    const iw = sprite.naturalWidth;
+    const ih = sprite.naturalHeight;
+    ctx.drawImage(
+      sprite,
+      0,
+      0,
+      iw,
+      ih,
+      -BIRD_W / 2,
+      -BIRD_H / 2,
+      BIRD_W,
+      BIRD_H
+    );
     ctx.restore();
   }
 
@@ -597,9 +602,10 @@
       drawX += HUD_COIN_ICON + gap;
     }
 
+    const hudBlur = canvasLite ? 2 : 6;
     ctx.fillStyle = "#fff";
     ctx.shadowColor = "rgba(0,0,0,0.72)";
-    ctx.shadowBlur = 6;
+    ctx.shadowBlur = hudBlur;
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 2;
     ctx.fillText(text, drawX, cy);
@@ -613,9 +619,10 @@
     ctx.textBaseline = "middle";
     const cy = HUD_TOP + HUD_COIN_ICON / 2;
     const label = "HI " + String(bestCoins);
+    const hudBlur = canvasLite ? 2 : 5;
     ctx.fillStyle = "#fff";
     ctx.shadowColor = "rgba(0,0,0,0.72)";
-    ctx.shadowBlur = 5;
+    ctx.shadowBlur = hudBlur;
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 2;
     ctx.fillText(label, WIDTH - 12, cy);
