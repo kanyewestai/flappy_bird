@@ -62,8 +62,8 @@ body {
   }
 
   .game-logo {
-    width: min(276px, 74vw);
-    max-height: min(100px, 19vh);
+    width: min(320px, 84vw);
+    max-height: min(124px, 24vh);
     transform: translateY(12px);
   }
 }
